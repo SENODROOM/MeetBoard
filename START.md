@@ -1,226 +1,337 @@
-# How to Run the Backend
+# 🚀 START GUIDE - Meet Board
 
-## Method 1: Docker (Recommended - Easiest)
+## Quick Start (Recommended)
 
-### Step 1: Install Docker Desktop
-Download and install Docker Desktop for Windows:
-https://www.docker.com/products/docker-desktop
+### Step 1: Start Backend
 
-### Step 2: Create Environment File
+Open PowerShell or Command Prompt and run:
+
 ```bash
-# Copy the example environment file
-copy .env.example .env
+docker-compose up -d --build
 ```
 
-### Step 3: Edit .env File
-Open `.env` in a text editor and change these values:
-```env
-POSTGRES_PASSWORD=MySecurePassword123
-MONGO_PASSWORD=MySecurePassword123
-REDIS_PASSWORD=MySecurePassword123
-MINIO_ROOT_PASSWORD=MySecurePassword123
-JWT_SECRET=this_is_a_very_long_secret_key_at_least_32_characters_long
-JWT_REFRESH_SECRET=this_is_another_very_long_secret_key_at_least_32_chars
-```
+Wait 30-45 seconds for services to start.
 
-### Step 4: Start All Services
+### Step 2: Initialize Database
+
 ```bash
-docker-compose up -d
+docker-compose exec -T postgres psql -U rtc_user -d rtc_app < backend/scripts/init-db.sql
 ```
 
-This will start:
-- PostgreSQL database
-- MongoDB database
-- Redis cache
-- MinIO file storage
-- Backend API server
+### Step 3: Create Storage Bucket
 
-### Step 5: Check if Running
 ```bash
-# Check all services are running
-docker-compose ps
-
-# View backend logs
-docker-compose logs -f backend
+docker-compose exec minio mc alias set myminio http://localhost:9000 admin SecurePassword123!
+docker-compose exec minio mc mb myminio/rtc-files --ignore-existing
 ```
 
-### Step 6: Create MinIO Bucket
-```bash
-# Windows Command Prompt
-docker-compose exec minio mc alias set myminio http://localhost:9000 admin MySecurePassword123
-docker-compose exec minio mc mb myminio/rtc-files
-```
+### Step 4: Verify Backend
 
-### Step 7: Test the API
-Open your browser or use curl:
-```
-http://localhost:3001/health
-```
-
-You should see: `{"status":"ok","timestamp":"..."}`
-
----
-
-## Method 2: Local Development (Without Docker)
-
-### Prerequisites
-1. Install Node.js 20+: https://nodejs.org/
-2. Install PostgreSQL 15+: https://www.postgresql.org/download/windows/
-3. Install MongoDB 7+: https://www.mongodb.com/try/download/community
-4. Install Redis: https://github.com/microsoftarchive/redis/releases
-
-### Step 1: Install Backend Dependencies
-```bash
-cd backend
-npm install
-```
-
-### Step 2: Setup PostgreSQL
-Open PostgreSQL command line (psql) and run:
-```sql
-CREATE DATABASE rtc_app;
-CREATE USER rtc_user WITH PASSWORD 'your_password';
-GRANT ALL PRIVILEGES ON DATABASE rtc_app TO rtc_user;
-\q
-```
-
-### Step 3: Create .env File
-```bash
-cd backend
-copy .env.example .env
-```
-
-Edit `backend/.env`:
-```env
-NODE_ENV=development
-PORT=3001
-DATABASE_URL=postgresql://rtc_user:your_password@localhost:5432/rtc_app
-MONGODB_URI=mongodb://localhost:27017/rtc_app
-REDIS_URL=redis://localhost:6379
-JWT_SECRET=your_jwt_secret_key_min_32_characters_long
-JWT_REFRESH_SECRET=your_refresh_secret_key_min_32_characters_long
-S3_ENDPOINT=http://localhost:9000
-S3_ACCESS_KEY=minioadmin
-S3_SECRET_KEY=minioadmin
-S3_BUCKET=rtc-files
-FRONTEND_URL=http://localhost:3000
-```
-
-### Step 4: Run Database Migrations
-```bash
-npm run migrate
-```
-
-### Step 5: Start the Server
-```bash
-npm run dev
-```
-
-The server will start on http://localhost:3001
-
----
-
-## Testing the Backend
-
-### 1. Health Check
 ```bash
 curl http://localhost:3001/health
 ```
 
-### 2. Register a User
+Should return: `{"status":"ok",...}`
+
+### Step 5: Start Frontend
+
 ```bash
-curl -X POST http://localhost:3001/api/auth/register ^
-  -H "Content-Type: application/json" ^
-  -d "{\"email\":\"test@example.com\",\"username\":\"testuser\",\"password\":\"SecurePassword123!\"}"
+cd frontend
+npm install
+npm run dev
 ```
 
-### 3. Login
-```bash
-curl -X POST http://localhost:3001/api/auth/login ^
-  -H "Content-Type: application/json" ^
-  -d "{\"email\":\"test@example.com\",\"password\":\"SecurePassword123!\"}"
-```
+### Step 6: Open Application
+
+Go to: **http://localhost:3000**
 
 ---
 
-## Stopping the Backend
+## Alternative: Use Batch Files
 
-### Docker
-```bash
-# Stop all services
-docker-compose down
+### Windows Users
 
-# Stop and remove all data (WARNING: deletes everything)
-docker-compose down -v
-```
+1. **Double-click:** `SETUP_COMPLETE.bat`
+   - Starts and initializes backend
+   - Wait for "Setup Complete!"
 
-### Local Development
-Press `Ctrl+C` in the terminal where the server is running
+2. **Double-click:** `START_FRONTEND.bat`
+   - Starts frontend
+   - Opens on http://localhost:3000
+
+---
+
+## First Time Setup
+
+### 1. Register Account
+
+1. Go to http://localhost:3000
+2. Click "Sign Up"
+3. Enter:
+   - Email: your@email.com
+   - Username: yourname
+   - Password: YourPassword123! (min 12 chars)
+4. Click "Sign Up"
+
+### 2. Create Room
+
+1. Click "+ Create Room"
+2. Enter room name
+3. Click "Create"
+
+### 3. Allow Permissions
+
+- Allow camera and microphone when prompted
+
+### 4. Start Using
+
+- Video controls at bottom
+- Chat on right sidebar
+- Whiteboard on right sidebar
 
 ---
 
 ## Troubleshooting
 
-### Port Already in Use
-```bash
-# Find what's using port 3001
-netstat -ano | findstr :3001
+### Registration Fails
 
-# Kill the process (replace PID with actual process ID)
-taskkill /PID <PID> /F
+**Error:** "Registration failed"
+
+**Fix:**
+```bash
+# Check if database tables exist
+docker-compose exec postgres psql -U rtc_user -d rtc_app -c "\dt"
+
+# If no tables, initialize:
+docker-compose exec -T postgres psql -U rtc_user -d rtc_app < backend/scripts/init-db.sql
+
+# Restart backend
+docker-compose restart backend
 ```
 
-### Docker Services Not Starting
+### Backend Won't Start
+
 ```bash
-# Check Docker Desktop is running
-# Restart Docker Desktop
-# Check logs
-docker-compose logs
+# Check Docker is running
+docker ps
+
+# View logs
+docker-compose logs backend
+
+# Restart
+docker-compose down
+docker-compose up -d --build
 ```
 
-### Database Connection Failed
+### Frontend Won't Start
+
 ```bash
-# Check if PostgreSQL is running
-sc query postgresql-x64-15
+cd frontend
 
-# Check if MongoDB is running
-sc query MongoDB
+# Clear and reinstall
+rm -rf node_modules
+npm install
 
-# Restart services if needed
+# Start
+npm run dev
 ```
 
-### Can't Access API
-- Make sure firewall allows port 3001
-- Check if backend is running: `docker-compose ps`
-- Check logs: `docker-compose logs backend`
+### Can't Connect
+
+```bash
+# Test backend
+curl http://localhost:3001/health
+
+# Check all services
+docker-compose ps
+
+# All should show "Up" and "healthy"
+```
+
+### Database Connection Error
+
+```bash
+# Reinitialize database
+docker-compose exec -T postgres psql -U rtc_user -d rtc_app < backend/scripts/init-db.sql
+```
 
 ---
 
-## Next Steps
-
-1. Backend is now running on http://localhost:3001
-2. You can test all API endpoints
-3. Build the frontend to connect to this backend
-4. Use WebSocket client to test real-time features
-
-## Useful Commands
+## Common Commands
 
 ```bash
-# View all running containers
-docker-compose ps
+# Start backend
+docker-compose up -d
 
-# View backend logs
+# Stop backend
+docker-compose down
+
+# View logs
 docker-compose logs -f backend
 
-# Restart backend only
+# Restart backend
 docker-compose restart backend
+
+# Check status
+docker-compose ps
+
+# Initialize database
+docker-compose exec -T postgres psql -U rtc_user -d rtc_app < backend/scripts/init-db.sql
 
 # Access PostgreSQL
 docker-compose exec postgres psql -U rtc_user -d rtc_app
 
 # Access MongoDB
-docker-compose exec mongodb mongosh -u admin -p
+docker-compose exec mongodb mongosh -u admin -p SecurePassword123!
 
 # Access Redis
-docker-compose exec redis redis-cli -a your_password
+docker-compose exec redis redis-cli -a SecurePassword123!
 ```
+
+---
+
+## Service URLs
+
+- **Frontend:** http://localhost:3000
+- **Backend API:** http://localhost:3001
+- **Backend Health:** http://localhost:3001/health
+- **MinIO Console:** http://localhost:9001
+  - Username: admin
+  - Password: SecurePassword123!
+
+---
+
+## Default Credentials
+
+### PostgreSQL
+- Host: localhost:5432
+- Database: rtc_app
+- User: rtc_user
+- Password: SecurePassword123!
+
+### MongoDB
+- Host: localhost:27017
+- User: admin
+- Password: SecurePassword123!
+
+### Redis
+- Host: localhost:6379
+- Password: SecurePassword123!
+
+### MinIO
+- Console: http://localhost:9001
+- Username: admin
+- Password: SecurePassword123!
+
+---
+
+## Verify Setup
+
+### Check Backend
+```bash
+curl http://localhost:3001/health
+```
+
+### Check Database
+```bash
+docker-compose exec postgres psql -U rtc_user -d rtc_app -c "\dt"
+```
+
+Should list: users, sessions, rooms, room_participants, files
+
+### Check Services
+```bash
+docker-compose ps
+```
+
+All should show "Up" and "healthy"
+
+---
+
+## Stop Everything
+
+```bash
+# Stop all services
+docker-compose down
+
+# Stop and remove data (WARNING: deletes everything)
+docker-compose down -v
+
+# Stop frontend
+Press Ctrl+C in terminal
+```
+
+---
+
+## Restart Everything
+
+```bash
+# Stop
+docker-compose down
+
+# Start fresh
+docker-compose up -d --build
+
+# Wait 30 seconds
+timeout /t 30
+
+# Initialize
+docker-compose exec -T postgres psql -U rtc_user -d rtc_app < backend/scripts/init-db.sql
+```
+
+---
+
+## Success Checklist
+
+- [ ] Docker Desktop running
+- [ ] Backend started: `docker-compose up -d`
+- [ ] Database initialized
+- [ ] Backend health check passes
+- [ ] Frontend started: `npm run dev`
+- [ ] Can access http://localhost:3000
+- [ ] Can register a user
+- [ ] Can create a room
+- [ ] Camera/microphone work
+
+---
+
+## Need More Help?
+
+- **COMPLETE_GUIDE.md** - Full documentation
+- **FRONTEND_GUIDE.md** - Frontend details
+- **SIMPLE_START.md** - Simplified instructions
+- **PROJECT_SUMMARY.md** - What was built
+
+---
+
+## Quick Test
+
+After starting everything:
+
+1. Open http://localhost:3000
+2. Click "Sign Up"
+3. Register with:
+   - Email: test@test.com
+   - Username: testuser
+   - Password: TestPassword123!
+4. Should redirect to Dashboard
+5. Click "+ Create Room"
+6. Enter "Test Room"
+7. Click "Create"
+8. Allow camera/microphone
+9. You should see your video!
+
+---
+
+## 🎉 You're Ready!
+
+Your Meet Board application is now running!
+
+- Create rooms
+- Invite others
+- Video call
+- Chat
+- Whiteboard
+- Screen share
+
+Enjoy! 🚀
