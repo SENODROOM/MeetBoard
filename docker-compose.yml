@@ -109,6 +109,22 @@ services:
       - rtc_network
     restart: unless-stopped
 
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:3001
+      NEXT_PUBLIC_WS_URL: http://localhost:3001
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+    networks:
+      - rtc_network
+    restart: unless-stopped
+
 volumes:
   postgres_data:
   mongo_data:
