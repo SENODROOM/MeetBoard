@@ -1,39 +1,52 @@
 # 🚀 START GUIDE - Meet Board
 
-## Quick Start (Recommended)
+## Quick Start (Easiest Way)
 
-### Step 1: Start Backend
+### Prerequisites
 
-Open PowerShell or Command Prompt and run:
+1. **Docker Desktop** - Must be running
+2. **Node.js 20+** - Installed
 
-```bash
-docker-compose up -d --build
-```
+---
 
-Wait 30-45 seconds for services to start.
+## ⚡ Start Everything with One Command
 
-### Step 2: Initialize Database
-
-```bash
-docker-compose exec -T postgres psql -U rtc_user -d rtc_app < backend/scripts/init-db.sql
-```
-
-### Step 3: Create Storage Bucket
+### From Root Directory
 
 ```bash
-docker-compose exec minio mc alias set myminio http://localhost:9000 admin SecurePassword123!
-docker-compose exec minio mc mb myminio/rtc-files --ignore-existing
+# First time - install dependencies
+npm install
+
+# Start everything
+npm run dev
 ```
 
-### Step 4: Verify Backend
+This will:
+- ✅ Start Docker services (PostgreSQL, MongoDB, Redis, MinIO)
+- ✅ Initialize database
+- ✅ Start backend on http://localhost:3001
+- ✅ Start frontend on http://localhost:3000
+
+**Just wait 30-45 seconds and open:** http://localhost:3000
+
+---
+
+## 🎯 Alternative: Run Separately
+
+### Backend
 
 ```bash
-curl http://localhost:3001/health
+cd backend
+npm install
+npm run dev
 ```
 
-Should return: `{"status":"ok",...}`
+This automatically:
+- Starts Docker services
+- Initializes database
+- Starts backend server
 
-### Step 5: Start Frontend
+### Frontend
 
 ```bash
 cd frontend
@@ -41,205 +54,21 @@ npm install
 npm run dev
 ```
 
-### Step 6: Open Application
-
-Go to: **http://localhost:3000**
-
 ---
 
-## Alternative: Use Batch Files
-
-### Windows Users
-
-1. **Double-click:** `SETUP_COMPLETE.bat`
-   - Starts and initializes backend
-   - Wait for "Setup Complete!"
-
-2. **Double-click:** `START_FRONTEND.bat`
-   - Starts frontend
-   - Opens on http://localhost:3000
-
----
-
-## First Time Setup
-
-### 1. Register Account
-
-1. Go to http://localhost:3000
-2. Click "Sign Up"
-3. Enter:
-   - Email: your@email.com
-   - Username: yourname
-   - Password: YourPassword123! (min 12 chars)
-4. Click "Sign Up"
-
-### 2. Create Room
-
-1. Click "+ Create Room"
-2. Enter room name
-3. Click "Create"
-
-### 3. Allow Permissions
-
-- Allow camera and microphone when prompted
-
-### 4. Start Using
-
-- Video controls at bottom
-- Chat on right sidebar
-- Whiteboard on right sidebar
-
----
-
-## Troubleshooting
-
-### Registration Fails
-
-**Error:** "Registration failed"
-
-**Fix:**
-```bash
-# Check if database tables exist
-docker-compose exec postgres psql -U rtc_user -d rtc_app -c "\dt"
-
-# If no tables, initialize:
-docker-compose exec -T postgres psql -U rtc_user -d rtc_app < backend/scripts/init-db.sql
-
-# Restart backend
-docker-compose restart backend
-```
-
-### Backend Won't Start
-
-```bash
-# Check Docker is running
-docker ps
-
-# View logs
-docker-compose logs backend
-
-# Restart
-docker-compose down
-docker-compose up -d --build
-```
-
-### Frontend Won't Start
-
-```bash
-cd frontend
-
-# Clear and reinstall
-rm -rf node_modules
-npm install
-
-# Start
-npm run dev
-```
-
-### Can't Connect
-
-```bash
-# Test backend
-curl http://localhost:3001/health
-
-# Check all services
-docker-compose ps
-
-# All should show "Up" and "healthy"
-```
-
-### Database Connection Error
-
-```bash
-# Reinitialize database
-docker-compose exec -T postgres psql -U rtc_user -d rtc_app < backend/scripts/init-db.sql
-```
-
----
-
-## Common Commands
-
-```bash
-# Start backend
-docker-compose up -d
-
-# Stop backend
-docker-compose down
-
-# View logs
-docker-compose logs -f backend
-
-# Restart backend
-docker-compose restart backend
-
-# Check status
-docker-compose ps
-
-# Initialize database
-docker-compose exec -T postgres psql -U rtc_user -d rtc_app < backend/scripts/init-db.sql
-
-# Access PostgreSQL
-docker-compose exec postgres psql -U rtc_user -d rtc_app
-
-# Access MongoDB
-docker-compose exec mongodb mongosh -u admin -p SecurePassword123!
-
-# Access Redis
-docker-compose exec redis redis-cli -a SecurePassword123!
-```
-
----
-
-## Service URLs
-
-- **Frontend:** http://localhost:3000
-- **Backend API:** http://localhost:3001
-- **Backend Health:** http://localhost:3001/health
-- **MinIO Console:** http://localhost:9001
-  - Username: admin
-  - Password: SecurePassword123!
-
----
-
-## Default Credentials
-
-### PostgreSQL
-- Host: localhost:5432
-- Database: rtc_app
-- User: rtc_user
-- Password: SecurePassword123!
-
-### MongoDB
-- Host: localhost:27017
-- User: admin
-- Password: SecurePassword123!
-
-### Redis
-- Host: localhost:6379
-- Password: SecurePassword123!
-
-### MinIO
-- Console: http://localhost:9001
-- Username: admin
-- Password: SecurePassword123!
-
----
-
-## Verify Setup
+## ✅ Verify It's Working
 
 ### Check Backend
 ```bash
 curl http://localhost:3001/health
 ```
 
-### Check Database
-```bash
-docker-compose exec postgres psql -U rtc_user -d rtc_app -c "\dt"
-```
+Should return: `{"status":"ok",...}`
 
-Should list: users, sessions, rooms, room_participants, files
+### Check Frontend
+Open: http://localhost:3000
 
-### Check Services
+### Check Docker Services
 ```bash
 docker-compose ps
 ```
@@ -248,90 +77,172 @@ All should show "Up" and "healthy"
 
 ---
 
-## Stop Everything
+## 🎮 First Time Use
 
+### 1. Register Account
+
+1. Go to http://localhost:3000
+2. Click **"Sign Up"**
+3. Enter:
+   - Email: test@example.com
+   - Username: testuser
+   - Password: TestPassword123! (min 12 chars)
+4. Click **"Sign Up"**
+
+### 2. Create Room
+
+1. Click **"+ Create Room"**
+2. Enter room name
+3. Click **"Create"**
+
+### 3. Allow Permissions
+
+- Click **"Allow"** for camera/microphone
+
+### 4. Start Using!
+
+- 🎤 Mute/unmute
+- 📹 Camera on/off
+- 🖥️ Share screen
+- 💬 Chat
+- 🎨 Whiteboard
+
+---
+
+## 🐛 Troubleshooting
+
+### Docker Not Running
+
+**Error:** "Docker is not running"
+
+**Fix:**
+1. Open Docker Desktop
+2. Wait for it to start
+3. Run command again
+
+### Registration Fails
+
+**Error:** "Registration failed"
+
+**Fix:**
 ```bash
-# Stop all services
-docker-compose down
+cd backend
+npm run db:init
+docker-compose restart backend
+```
 
-# Stop and remove data (WARNING: deletes everything)
-docker-compose down -v
+### Port Already in Use
 
-# Stop frontend
-Press Ctrl+C in terminal
+**Fix:**
+```bash
+# Find process
+netstat -ano | findstr :3001
+
+# Kill it
+taskkill /PID <PID> /F
+```
+
+### Frontend Can't Connect
+
+**Fix:**
+```bash
+# Make sure backend is running
+curl http://localhost:3001/health
+
+# If not, start it
+cd backend
+npm run dev
 ```
 
 ---
 
-## Restart Everything
+## 📝 Available Commands
+
+### Root Directory
+
+```bash
+npm run dev          # Start everything
+npm run docker:stop  # Stop Docker services
+npm run docker:logs  # View logs
+npm run setup        # Install all dependencies
+```
+
+### Backend
+
+```bash
+npm run dev          # Start with Docker
+npm run dev:local    # Start without Docker
+npm run docker:start # Start Docker only
+npm run docker:stop  # Stop Docker
+npm run db:init      # Initialize database
+```
+
+### Frontend
+
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm start            # Run production build
+```
+
+---
+
+## 🛑 Stop Everything
+
+```bash
+# Stop Docker
+npm run docker:stop
+
+# Stop frontend/backend
+Press Ctrl+C in terminals
+```
+
+---
+
+## 🔄 Restart Everything
 
 ```bash
 # Stop
-docker-compose down
+npm run docker:stop
 
-# Start fresh
-docker-compose up -d --build
-
-# Wait 30 seconds
-timeout /t 30
-
-# Initialize
-docker-compose exec -T postgres psql -U rtc_user -d rtc_app < backend/scripts/init-db.sql
+# Start
+npm run dev
 ```
 
 ---
 
-## Success Checklist
+## 📊 Service URLs
 
-- [ ] Docker Desktop running
-- [ ] Backend started: `docker-compose up -d`
-- [ ] Database initialized
-- [ ] Backend health check passes
-- [ ] Frontend started: `npm run dev`
-- [ ] Can access http://localhost:3000
-- [ ] Can register a user
-- [ ] Can create a room
-- [ ] Camera/microphone work
+- **Frontend:** http://localhost:3000
+- **Backend:** http://localhost:3001
+- **Backend Health:** http://localhost:3001/health
+- **MinIO Console:** http://localhost:9001
 
 ---
 
-## Need More Help?
+## 🔐 Default Credentials
 
-- **COMPLETE_GUIDE.md** - Full documentation
-- **FRONTEND_GUIDE.md** - Frontend details
-- **SIMPLE_START.md** - Simplified instructions
-- **PROJECT_SUMMARY.md** - What was built
-
----
-
-## Quick Test
-
-After starting everything:
-
-1. Open http://localhost:3000
-2. Click "Sign Up"
-3. Register with:
-   - Email: test@test.com
-   - Username: testuser
-   - Password: TestPassword123!
-4. Should redirect to Dashboard
-5. Click "+ Create Room"
-6. Enter "Test Room"
-7. Click "Create"
-8. Allow camera/microphone
-9. You should see your video!
+- **PostgreSQL:** rtc_user / SecurePassword123!
+- **MongoDB:** admin / SecurePassword123!
+- **Redis:** SecurePassword123!
+- **MinIO:** admin / SecurePassword123!
 
 ---
 
 ## 🎉 You're Ready!
 
-Your Meet Board application is now running!
+Just run:
+```bash
+npm run dev
+```
 
-- Create rooms
-- Invite others
-- Video call
-- Chat
-- Whiteboard
-- Screen share
+And start using Meet Board! 🚀
 
-Enjoy! 🚀
+---
+
+## 📚 More Documentation
+
+- **SIMPLE_DEV_GUIDE.md** - Quick reference
+- **DEV_GUIDE.md** - Detailed development guide
+- **README_START_HERE.md** - Complete documentation
+- **COMPLETE_GUIDE.md** - Full guide

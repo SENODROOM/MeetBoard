@@ -1,294 +1,361 @@
-# Real-Time Communication Application
+# Meet Board - Real-Time Collaboration Platform
 
-A full-featured real-time communication platform with video calling, screen sharing, collaborative whiteboard, chat, and secure file sharing.
+A full-stack video conferencing and collaboration platform with WebRTC, real-time chat, and collaborative whiteboard features.
 
-## Features
-
-- **Multi-User Video Calling**: WebRTC-based video/audio communication
-- **Screen Sharing**: Share your screen with participants
-- **Collaborative Whiteboard**: Real-time drawing and collaboration
-- **Real-Time Chat**: Instant messaging with message history
-- **Secure File Sharing**: End-to-end encrypted file uploads and downloads
-- **Room Management**: Create, join, and manage meeting rooms
-- **User Authentication**: Secure JWT-based authentication
-
-## Architecture
-
-See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed system architecture.
-
-## Tech Stack
-
-See [TECH_STACK.md](./TECH_STACK.md) for complete technology breakdown.
-
-## Project Structure
-
-```
-rtc-app/
-├── backend/                 # Node.js/Express backend
-│   ├── src/
-│   │   ├── controllers/    # Request handlers
-│   │   ├── routes/         # API routes
-│   │   ├── sockets/        # WebSocket handlers
-│   │   ├── models/         # Database models
-│   │   ├── middleware/     # Express middleware
-│   │   ├── config/         # Configuration files
-│   │   └── types/          # TypeScript types
-│   ├── scripts/            # Database migrations
-│   └── Dockerfile
-├── docker-compose.yml      # Docker services configuration
-├── ARCHITECTURE.md         # System architecture documentation
-├── TECH_STACK.md          # Technology stack details
-├── IMPLEMENTATION.md      # Implementation guide
-└── DEPLOYMENT.md          # Deployment instructions
-```
-
-## Quick Start
+## 🚀 Quick Start
 
 ### Prerequisites
-
-- Docker and Docker Compose
-- Node.js 20+ (for local development)
+- Node.js 18+ and npm
+- Docker Desktop (for databases)
 - Git
 
-### Using Docker (Recommended)
+### Installation & Setup
 
-1. Clone the repository:
+1. **Clone and Install**
 ```bash
 git clone <repository-url>
-cd rtc-app
-```
-
-2. Create environment file:
-```bash
-cp .env.example .env
-```
-
-3. Update `.env` with secure passwords and secrets
-
-4. Start all services:
-```bash
-docker-compose up -d
-```
-
-5. Check service status:
-```bash
-docker-compose ps
-```
-
-6. View logs:
-```bash
-docker-compose logs -f backend
-```
-
-The backend will be available at `http://localhost:3001`
-
-### Local Development
-
-1. Install dependencies:
-```bash
-cd backend
+cd meet-board
 npm install
+cd frontend && npm install
+cd ../backend && npm install
 ```
 
-2. Set up databases (PostgreSQL, MongoDB, Redis, MinIO)
-
-3. Create `.env` file in backend directory:
+2. **Start the Application**
 ```bash
-cp .env.example .env
-```
-
-4. Run database migrations:
-```bash
-npm run migrate
-```
-
-5. Start development server:
-```bash
+# From the backend directory
+cd backend
 npm run dev
 ```
 
-## API Documentation
+This will automatically:
+- Start all Docker services (PostgreSQL, MongoDB, Redis, MinIO)
+- Initialize databases
+- Start the backend server on port 3001
 
-### Authentication Endpoints
+3. **Start Frontend** (in a new terminal)
+```bash
+cd frontend
+npm run dev
+```
 
+Frontend will be available at: http://localhost:3000 (or 3002 if 3000 is busy)
+
+## 🏗️ Architecture
+
+### Tech Stack
+
+**Frontend:**
+- Next.js 14 (React 18)
+- TypeScript
+- Tailwind CSS
+- Zustand (State Management)
+- Socket.io Client
+- Fabric.js (Whiteboard)
+- Simple-peer (WebRTC)
+
+**Backend:**
+- Node.js + Express
+- TypeScript
+- Socket.io
+- PostgreSQL (User data)
+- MongoDB (Chat messages)
+- Redis (Sessions & caching)
+- MinIO (S3-compatible file storage)
+
+### Project Structure
+```
+meet-board/
+├── frontend/               # Next.js frontend
+│   ├── src/
+│   │   ├── app/           # Next.js 14 app router
+│   │   ├── components/    # React components
+│   │   ├── hooks/         # Custom React hooks
+│   │   ├── services/      # API services
+│   │   ├── store/         # Zustand stores
+│   │   └── types/         # TypeScript types
+│   └── package.json
+│
+├── backend/               # Express backend
+│   ├── src/
+│   │   ├── config/       # Database configs
+│   │   ├── controllers/  # Route controllers
+│   │   ├── middleware/   # Express middleware
+│   │   ├── models/       # Data models
+│   │   ├── routes/       # API routes
+│   │   ├── sockets/      # Socket.io handlers
+│   │   └── types/        # TypeScript types
+│   ├── scripts/          # Setup scripts
+│   └── package.json
+│
+├── docker-compose.yml    # Docker services
+└── .env                  # Root environment variables
+```
+
+## 🔧 Configuration
+
+### Environment Variables
+
+**Root `.env`:**
+```env
+POSTGRES_PASSWORD=SecurePassword123!
+MONGO_PASSWORD=SecurePassword123!
+REDIS_PASSWORD=SecurePassword123!
+MINIO_ROOT_USER=admin
+MINIO_ROOT_PASSWORD=SecurePassword123!
+```
+
+**Backend `.env`:**
+```env
+NODE_ENV=development
+PORT=3001
+DATABASE_URL=postgresql://rtc_user:SecurePassword123%21@localhost:5432/rtc_app
+MONGODB_URI=<your-mongodb-uri>
+REDIS_URL=redis://default:SecurePassword123!@localhost:6379
+JWT_SECRET=<your-jwt-secret>
+JWT_REFRESH_SECRET=<your-refresh-secret>
+S3_ENDPOINT=http://localhost:9000
+S3_ACCESS_KEY=admin
+S3_SECRET_KEY=SecurePassword123!
+S3_BUCKET=rtc-files
+FRONTEND_URL=http://localhost:3000,http://localhost:3002
+```
+
+**Frontend `.env.local`:**
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3001
+NEXT_PUBLIC_WS_URL=http://localhost:3001
+PORT=3000
+```
+
+## 🎯 Features
+
+### Core Features
+- **Video Conferencing**: WebRTC-based peer-to-peer video calls
+- **Real-time Chat**: Socket.io powered instant messaging
+- **Collaborative Whiteboard**: Multi-user drawing with Fabric.js
+- **File Sharing**: Upload and share files via MinIO S3 storage
+- **User Authentication**: JWT-based auth with refresh tokens
+- **Room Management**: Create and join meeting rooms
+
+### Security Features
+- Helmet.js security headers
+- CORS protection
+- Rate limiting
+- Password hashing (bcrypt)
+- JWT token authentication
+- Secure cookie handling
+
+## 📡 API Endpoints
+
+### Authentication
 - `POST /api/auth/register` - Register new user
 - `POST /api/auth/login` - Login user
 - `POST /api/auth/logout` - Logout user
 - `POST /api/auth/refresh` - Refresh access token
-- `GET /api/auth/profile` - Get user profile
+- `GET /api/auth/profile` - Get user profile (protected)
 
-### Room Endpoints
+### Rooms
+- `POST /api/rooms` - Create room (protected)
+- `GET /api/rooms/:id` - Get room details (protected)
+- `GET /api/rooms` - List user's rooms (protected)
 
-- `POST /api/rooms` - Create a new room
-- `GET /api/rooms` - List available rooms
-- `GET /api/rooms/:roomId` - Get room details
-- `POST /api/rooms/:roomId/join` - Join a room
-- `POST /api/rooms/:roomId/leave` - Leave a room
-- `POST /api/rooms/:roomId/end` - End a room (host only)
+### Chat
+- `GET /api/chat/:roomId` - Get chat history (protected)
 
-### Chat Endpoints
+### Files
+- `POST /api/files/upload` - Upload file (protected)
+- `GET /api/files/:fileId` - Download file (protected)
 
-- `GET /api/chat/:roomId/history` - Get chat history
-- `DELETE /api/chat/messages/:messageId` - Delete a message
-- `PUT /api/chat/messages/:messageId` - Edit a message
+### Health
+- `GET /health` - Health check
+- `GET /ready` - Readiness check
 
-### File Endpoints
-
-- `POST /api/files/upload` - Upload a file
-- `GET /api/files/:fileId/url` - Get file download URL
-- `GET /api/files/room/:roomId` - List room files
-- `DELETE /api/files/:fileId` - Delete a file
-
-## WebSocket Events
+## 🔌 Socket.io Events
 
 ### WebRTC Signaling
-
-- `join-room` - Join a video call room
+- `join-room` - Join a room
 - `offer` - Send WebRTC offer
 - `answer` - Send WebRTC answer
 - `ice-candidate` - Exchange ICE candidates
-- `toggle-media` - Toggle audio/video
-- `start-screen-share` - Start screen sharing
-- `stop-screen-share` - Stop screen sharing
-- `leave-room` - Leave the room
+- `leave-room` - Leave room
 
-### Chat Events
+### Chat
+- `chat-message` - Send/receive messages
+- `typing` - Typing indicators
 
-- `chat-message` - Send a chat message
-- `typing-start` - User started typing
-- `typing-stop` - User stopped typing
+### Whiteboard
+- `whiteboard-draw` - Drawing events
+- `whiteboard-clear` - Clear whiteboard
+- `whiteboard-undo` - Undo action
 
-### Whiteboard Events
+## 🐳 Docker Services
 
-- `whiteboard-draw` - Draw on whiteboard
-- `whiteboard-get-history` - Get whiteboard history
+The application uses Docker Compose to manage services:
 
-## Database Schema
+- **PostgreSQL** (port 5432): User accounts and room data
+- **MongoDB** (port 27017): Chat messages and logs
+- **Redis** (port 6379): Session storage and caching
+- **MinIO** (ports 9000, 9001): S3-compatible file storage
 
-### PostgreSQL Tables
-
-- `users` - User accounts
-- `sessions` - Authentication sessions
-- `rooms` - Meeting rooms
-- `room_participants` - Room membership
-- `files` - File metadata
-
-### MongoDB Collections
-
-- `chatmessages` - Chat message history
-- `whiteboards` - Whiteboard action history
-
-## Security Features
-
-- Password hashing with bcrypt (cost factor 12)
-- JWT tokens with short expiration (15 minutes)
-- Refresh tokens (7 days)
-- httpOnly, secure cookies
-- Rate limiting on all endpoints
-- Input validation and sanitization
-- CORS protection
-- Helmet security headers
-- End-to-end encryption for files
-- WebRTC encryption (DTLS-SRTP)
-
-## Environment Variables
-
-See `.env.example` for all required environment variables.
-
-Key variables:
-- `DATABASE_URL` - PostgreSQL connection string
-- `MONGODB_URI` - MongoDB connection string
-- `REDIS_URL` - Redis connection string
-- `JWT_SECRET` - JWT signing secret (min 32 chars)
-- `JWT_REFRESH_SECRET` - Refresh token secret (min 32 chars)
-- `S3_ENDPOINT` - S3/MinIO endpoint
-- `S3_ACCESS_KEY` - S3 access key
-- `S3_SECRET_KEY` - S3 secret key
-
-## Testing
-
+### Docker Commands
 ```bash
-# Run tests
-npm test
+# Start all services
+docker-compose up -d
 
-# Run with coverage
-npm run test:coverage
+# Stop all services
+docker-compose down
+
+# View logs
+docker-compose logs -f
+
+# Restart a service
+docker-compose restart <service-name>
 ```
 
-## Building for Production
+## 🛠️ Development
 
+### Running in Development Mode
+
+**Backend:**
 ```bash
-# Build backend
+cd backend
+npm run dev  # Starts with ts-node-dev (hot reload)
+```
+
+**Frontend:**
+```bash
+cd frontend
+npm run dev  # Starts Next.js dev server
+```
+
+### Building for Production
+
+**Backend:**
+```bash
 cd backend
 npm run build
-
-# Build Docker image
-docker build -t rtc-backend .
+npm start
 ```
 
-## Deployment
+**Frontend:**
+```bash
+cd frontend
+npm run build
+npm start
+```
 
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed deployment instructions including:
-- Docker deployment
-- Kubernetes deployment
-- NGINX configuration
-- SSL/TLS setup
-- Monitoring and logging
-- Scaling strategies
+### Using Docker Compose (Full Stack)
+```bash
+docker-compose up --build
+```
 
-## Troubleshooting
+## 🐛 Troubleshooting
+
+### Port Already in Use
+```bash
+# Windows - Kill process on port
+netstat -ano | findstr :3000
+taskkill /PID <PID> /F
+
+# Or use the provided script
+KILL_PORTS.bat
+```
 
 ### Database Connection Issues
-
 ```bash
-# Check PostgreSQL
-docker-compose exec postgres psql -U rtc_user -d rtc_app
+# Check if Docker containers are running
+docker ps
 
-# Check MongoDB
-docker-compose exec mongodb mongosh -u admin -p
+# Restart Docker services
+docker-compose restart
 
-# Check Redis
-docker-compose exec redis redis-cli -a your_password ping
+# Check logs
+docker-compose logs postgres
+docker-compose logs mongodb
+docker-compose logs redis
 ```
 
-### WebSocket Connection Issues
+### Redis Connection Error
+- Ensure Redis URL format: `redis://default:password@localhost:6379`
+- Check password matches in `.env` and `backend/.env`
 
-- Ensure CORS is properly configured
-- Check firewall rules
-- Verify WebSocket upgrade headers in NGINX
+### PostgreSQL Authentication Failed
+- URL encode special characters in password (! becomes %21)
+- Example: `SecurePassword123!` → `SecurePassword123%21`
 
-### File Upload Issues
+### Frontend Can't Connect to Backend
+- Check CORS settings in `backend/src/index.ts`
+- Verify `FRONTEND_URL` in `backend/.env` includes your frontend port
+- Ensure backend is running on port 3001
 
-- Check MinIO is running: `docker-compose ps minio`
-- Verify bucket exists: `docker-compose exec minio mc ls myminio/`
-- Check file size limits in configuration
+## 📝 Scripts
 
-## Contributing
+### Backend Scripts
+- `npm run dev` - Start development server
+- `npm run build` - Build TypeScript
+- `npm start` - Start production server
+- `npm run migrate` - Run database migrations
 
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
+### Frontend Scripts
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm start` - Start production server
+- `npm run lint` - Run ESLint
 
-## License
+## 🔐 Security Notes
 
-MIT License - see LICENSE file for details
+- Change all default passwords in production
+- Use strong JWT secrets (minimum 32 characters)
+- Enable HTTPS in production
+- Configure proper CORS origins
+- Set up rate limiting appropriately
+- Use environment variables for sensitive data
+- Never commit `.env` files to version control
 
-## Support
+## 📦 Database Initialization
+
+The backend automatically:
+1. Creates database tables on first run
+2. Sets up MinIO buckets
+3. Initializes Redis connection
+4. Connects to MongoDB
+
+Manual initialization:
+```bash
+cd backend
+npm run migrate
+```
+
+## 🚢 Deployment
+
+### Environment Setup
+1. Set `NODE_ENV=production`
+2. Update all URLs to production domains
+3. Use strong passwords and secrets
+4. Configure SSL/TLS certificates
+5. Set up proper CORS origins
+
+### Recommended Hosting
+- **Frontend**: Vercel, Netlify, or AWS Amplify
+- **Backend**: AWS EC2, DigitalOcean, or Heroku
+- **Databases**: Managed services (AWS RDS, MongoDB Atlas, Redis Cloud)
+- **Storage**: AWS S3 or DigitalOcean Spaces
+
+## 📄 License
+
+[Your License Here]
+
+## 👥 Contributing
+
+[Your Contributing Guidelines Here]
+
+## 📞 Support
 
 For issues and questions:
 - Create an issue on GitHub
-- Check documentation in `/docs`
-- Review [ARCHITECTURE.md](./ARCHITECTURE.md) and [IMPLEMENTATION.md](./IMPLEMENTATION.md)
+- Check existing documentation
+- Review troubleshooting section
 
-## Roadmap
+---
 
-- [ ] Recording functionality
-- [ ] AI-powered transcription
-- [ ] Virtual backgrounds
-- [ ] Breakout rooms
-- [ ] Polls and reactions
-- [ ] Mobile app support
-- [ ] Calendar integration
-- [ ] Analytics dashboard
+**Built with ❤️ using Next.js, Express, and WebRTC**
