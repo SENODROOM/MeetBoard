@@ -221,6 +221,7 @@ CLIENT_URL=https://yourdomain.com
 **Client** (`client/.env`):
 ```env
 REACT_APP_SERVER_URL=https://your-server-domain.com
+REACT_APP_ICE_SERVERS=[{"urls":"stun:stun.l.google.com:19302"},{"urls":"turn:turn.yourdomain.com:3478","username":"user","credential":"pass"}]
 ```
 
 ### Build the React App
