@@ -25,4 +25,4 @@ Quarterly restore drill. Record date + owner in the table below.
 ## Cost glance
 
 - Atlas backup $/mo vs cluster tier — note in quarterly cost review.
-- Vercel Blob storage for recordings — purge policy TBD (retention KR).
+- Vercel Blob storage for recordings — purged via `/api/cron/recordings-retention` (`RECORDING_RETENTION_DAYS`).

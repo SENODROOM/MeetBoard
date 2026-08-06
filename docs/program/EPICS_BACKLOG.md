@@ -1,6 +1,6 @@
 # Epics Backlog — 24-Month Program
 
-Finished light work is **removed** (not marked done).
+Finished work is **removed** (not marked done).
 
 **Deploy constraint:** Vercel serverless + WebRTC mesh + Mongo HTTP signaling. **No hosted SFU.**
 
@@ -20,7 +20,7 @@ Finished light work is **removed** (not marked done).
 
 ## Year 1–2 feature rows
 
-*(Cleared — remaining proof work lives in [OKRS_Y1.md](./OKRS_Y1.md) / [OKRS_Y2.md](./OKRS_Y2.md).)*
+*(Cleared.)*
 
 ---
 
@@ -37,10 +37,9 @@ Finished light work is **removed** (not marked done).
 
 ## Pull order (next)
 
-1. Live TURN + staging signaling SLO (Y1Q1)  
-2. Pilot orgs + scheduled-post soak (Y1Q2)  
-3. Atlas multi-region + DR restore (Y2Q2)  
-4. Standing E-901 / E-903  
+1. Security review cadence (E-901)  
+2. Reliability debt (E-903)  
+3. Design system (E-902)  
 
 ---
 

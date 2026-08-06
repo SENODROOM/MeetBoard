@@ -17,4 +17,4 @@
 - Slower poll when tab hidden; presence heartbeat skipped when hidden  
 - Longer idle poll interval + 15s heartbeat / 45s presence stale  
 
-**Not yet:** dedicated Grafana/Datadog dashboards (full epic remaining for Platform).
+**Dashboards:** use `/api/health` metrics + Vercel/Atlas consoles; optional Grafana later under E-903.

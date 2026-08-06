@@ -18,7 +18,7 @@ Early product iterations used managed pub/sub (Ably), then a **Mongo-backed even
 1. **Primary app API** remains dual Vercel projects: `client/` SPA + `server/` Express.  
 2. **Primary signaling / fan-out** remains **Mongo event bus + HTTP poll/long-poll** (`GET/POST /api/rooms/:roomId/events`, presence heartbeats). No Socket.io server on Vercel.  
 3. **Do not** reintroduce a third-party pub/sub as the *required* production bus unless ADR-001 is amended with cost/SLO justification.  
-4. **Bus exit criteria:** published SLOs (p95 delivery), indexes, backpressure, load tests (see `docs/slo/signaling.md`) — still need staging proof for remaining OKRs.  
+4. **Bus exit criteria:** published SLOs (p95 delivery), indexes, backpressure, load tests (see `docs/slo/signaling.md`).  
 5. **Later:** If SLOs cannot be met with poll/long-poll under multi-region load, evaluate a **dedicated realtime edge** (e.g. Cloudflare Durable Objects, PartyKit-class, or regional Node fleet) — still **not** “Socket.io bolted onto Vercel Hobby/Pro as the only listener.” Record the choice as an **addendum** to this ADR.  
 6. **Media** stays **WebRTC mesh** on this deploy ([ADR-002](./ADR-002-sfu-evaluation.md)); mesh does not replace app-level chat/host event persistence.
 

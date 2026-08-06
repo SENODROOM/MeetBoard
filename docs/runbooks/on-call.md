@@ -18,4 +18,4 @@
 - Secondary covers if primary is OOO.  
 - Hand-off every Monday with open incidents listed.
 
-Staff this table before claiming KR1.5 complete in production.
+Staff this table for production paging.

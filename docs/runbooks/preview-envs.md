@@ -12,7 +12,7 @@ Every PR gets disposable **API** + **client** preview URLs (Vercel).
 4. CORS: `EXTRA_ALLOWED_ORIGINS` or existing `quantum-meet-frontend-*.vercel.app` pattern.
 5. Smoke: open client preview → home loads; `GET {api}/api/health` → `ok`.
 
-## Gaps still open
+## Notes
 
-- Auto-wire `REACT_APP_SERVER_URL` to matching API deployment per PR (CI script).
-- Seeded staging data for classroom E2E.
+- Prefer wiring `REACT_APP_SERVER_URL` to the matching API preview per PR.  
+- Seed staging data when running classroom E2E against previews.  
